@@ -2,6 +2,7 @@ import 'package:driver/question-screen/bloc/question_bloc.dart';
 import 'package:driver/services/service_locator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class QuestionScreen extends StatefulWidget {
   final String title;
@@ -26,9 +27,8 @@ class _QuestionListState extends State<QuestionScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title, style: TextStyle(fontSize: 20)),
+        title: Text(widget.title),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // actions: [Container(child: Text(see),)],
       ),
       body: BlocBuilder<QuestionBloc, QuestionState>(
         bloc: locator<QuestionBloc>(),
@@ -46,27 +46,27 @@ class _QuestionListState extends State<QuestionScreen> {
 
             return ListView.builder(
               itemCount: questions.length,
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(16.sp),
               itemBuilder: (context, index) {
                 final question = questions[index];
                 final questionId = question.sId?.toString() ?? '$index';
                 final selectedOption = selectedAnswers[questionId];
 
                 return Card(
-                  margin: const EdgeInsets.symmetric(vertical: 8),
+                  margin: EdgeInsets.symmetric(vertical: 8.h),
                   child: Padding(
-                    padding: const EdgeInsets.all(16),
+                    padding: EdgeInsets.all(16.sp),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           '(${index + 1}) ${question.question ?? "No Question"}',
-                          style: const TextStyle(
-                            fontSize: 16,
+                          style: TextStyle(
+                            fontSize: 18.sp,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(height: 12),
+                        SizedBox(height: 12.h),
                         ...question.options?.map((option) {
                               final isCorrect =
                                   option.trim().toLowerCase() ==
@@ -96,18 +96,19 @@ class _QuestionListState extends State<QuestionScreen> {
                                         : null,
                                 child: Container(
                                   width: double.infinity,
-                                  margin: const EdgeInsets.symmetric(
-                                    vertical: 6,
-                                  ),
-                                  padding: const EdgeInsets.all(12),
+                                  margin: EdgeInsets.symmetric(vertical: 6.h),
+                                  padding: EdgeInsets.all(12.sp),
                                   decoration: BoxDecoration(
                                     color: optionColor ?? Colors.grey[200],
-                                    borderRadius: BorderRadius.circular(8),
+                                    borderRadius: BorderRadius.circular(10.r),
                                     border: Border.all(color: Colors.grey),
                                   ),
                                   child: Text(
                                     '${nepaliLabels[question.options!.indexOf(option)]}  ${option.toString()}',
-                                    style: const TextStyle(fontSize: 14),
+                                    style: TextStyle(
+                                      fontSize: 17.sp,
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
                                 ),
                               );

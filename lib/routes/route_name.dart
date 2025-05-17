@@ -5,4 +5,5 @@ class Routes {
   static const String questionScreen = "/question_screen";
 
   static const String practiceScreen = "/practice_screen";
+  static const String colorVisionScreen = "/vision_screen";
 }

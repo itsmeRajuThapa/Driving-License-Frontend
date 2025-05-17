@@ -4,6 +4,8 @@ import 'package:driver/practice-screen/model/mock_qtn_model.dart';
 import 'package:driver/services/service_locator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:percent_indicator/circular_percent_indicator.dart';
 
 class PracticeScreen extends StatefulWidget {
   const PracticeScreen({super.key});
@@ -39,42 +41,41 @@ class _PracticeScreenState extends State<PracticeScreen> {
   }
 
   void _handleSubmit(List<MockQuestionModel> questions) {
-  if (selectedAnswers.length < questions.length) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('कृपया सबै प्रश्नहरूको जवाफ दिनुहोस्।')),
-    );
-    return;
+    if (selectedAnswers.length < questions.length) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('कृपया सबै प्रश्नहरूको जवाफ दिनुहोस्।')),
+      );
+      return;
+    }
+
+    final submission =
+        selectedAnswers.entries
+            .where((entry) => entry.key < questions.length)
+            .map((entry) {
+              final questionId = questions[entry.key].questionId;
+              return {
+                'questionId': questionId.toString(),
+                'answer': entry.value.toString(),
+              };
+            })
+            .where((s) {
+              final isValid =
+                  s['questionId']!.isNotEmpty && s['answer']!.isNotEmpty;
+              if (!isValid) {}
+              return isValid;
+            })
+            .toList();
+
+    if (submission.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('कुनै मान्य जवाफ फेला परेन।')),
+      );
+      return;
+    }
+
+    _timer?.cancel();
+    locator<PracticeBloc>().add(SubmitPracticeAnswers(submission));
   }
-
-  final submission = selectedAnswers.entries
-      .where((entry) => entry.key < questions.length)
-      .map((entry) {
-        final questionId = questions[entry.key].questionId;
-        return {
-          'questionId': questionId.toString(),
-          'answer': entry.value.toString(),
-        };
-      })
-      .where((s) {
-        final isValid = s['questionId']!.isNotEmpty && s['answer']!.isNotEmpty;
-        if (!isValid) {
-        }
-        return isValid;
-      })
-      .toList();
-
-  if (submission.isEmpty) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('कुनै मान्य जवाफ फेला परेन।')),
-    );
-    return;
-  }
-
-  _timer?.cancel();
-  locator<PracticeBloc>().add(SubmitPracticeAnswers(submission));
-}
-
-   
 
   void _handleRetry() {
     setState(() {
@@ -102,18 +103,6 @@ class _PracticeScreenState extends State<PracticeScreen> {
       appBar: AppBar(
         title: const Text('अभ्यास प्रश्न'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              'समय: ${_formatTime(_secondsRemaining)}',
-              style: const TextStyle(
-                fontFamily: 'NotoSansNepali',
-                fontSize: 16,
-              ),
-            ),
-          ),
-        ],
       ),
       body: BlocListener<PracticeBloc, PracticeState>(
         bloc: locator<PracticeBloc>(),
@@ -126,21 +115,79 @@ class _PracticeScreenState extends State<PracticeScreen> {
               context: context,
               builder:
                   (_) => AlertDialog(
-                    title: const Text('प्रश्नोत्तर समाप्त'),
-                    content: Text(
-                      'सही: ${state.correctAnswers ?? 0} / ${state.allPracticeQuestionList.length}\n'
-                      'अंक: ${state.scorePercentage?.toStringAsFixed(2) ?? '0.00'}%',
-                      style: const TextStyle(fontFamily: 'NotoSansNepali'),
+                    title: Text(
+                      state.correctAnswers! > 10
+                          ? 'You Have Passed'
+                          : 'You Have Failed',
+                      style:
+                          state.correctAnswers! > 10
+                              ? TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.green,
+                              )
+                              : TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.red,
+                              ),
+                      textAlign: TextAlign.center,
+                    ),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        CircularPercentIndicator(
+                          radius: 60.0.r,
+                          lineWidth: 10.0.w,
+                          percent: (state.scorePercentage ?? 0) / 100,
+                          center: Text(
+                            '${state.scorePercentage?.toStringAsFixed(1) ?? '0.0'}%',
+                            style: TextStyle(
+                              fontSize: 23.sp,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          progressColor:
+                              (state.correctAnswers ?? 0) > 10
+                                  ? const Color.fromARGB(255, 3, 154, 8)
+                                  : Colors.red,
+                          backgroundColor: Colors.grey.shade500,
+                          animation: true,
+                        ),
+                        SizedBox(height: 15.h),
+                        Text(
+                          'सही: ${state.correctAnswers ?? 0} / ${state.totalQuestions}',
+                          style: TextStyle(
+                            fontSize: 22.sp,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ],
                     ),
                     actions: [
                       TextButton(
+                        style: ButtonStyle(
+                          backgroundColor: WidgetStateProperty.all<Color>(
+                            Colors.amber,
+                          ),
+                          foregroundColor: WidgetStateProperty.all<Color>(
+                            Colors.black,
+                          ), // Text color
+                        ),
                         onPressed: () {
                           Navigator.pop(context);
                           _handleRetry();
                         },
                         child: const Text('पुन: प्रयास गर्नुहोस्'),
                       ),
+                      Spacer(),
                       TextButton(
+                        style: ButtonStyle(
+                          backgroundColor: WidgetStateProperty.all<Color>(
+                            Colors.amber,
+                          ),
+                          foregroundColor: WidgetStateProperty.all<Color>(
+                            Colors.black,
+                          ), // Text color, // Text color
+                        ),
                         onPressed: () => Navigator.pop(context),
                         child: const Text('ठीक छ'),
                       ),
@@ -190,11 +237,10 @@ class _PracticeScreenState extends State<PracticeScreen> {
                       itemBuilder: (context, index) {
                         final question = questions[index];
                         final selected = selectedAnswers[index];
-                        final labels = ['(क)', '(ख)', '(ग)', '(घ)'];
 
                         return Card(
                           elevation: 4,
-                          margin: const EdgeInsets.symmetric(vertical: 8),
+                          margin: EdgeInsets.symmetric(vertical: 8.h),
                           child: Padding(
                             padding: const EdgeInsets.all(16),
                             child: Column(
@@ -202,26 +248,21 @@ class _PracticeScreenState extends State<PracticeScreen> {
                               children: [
                                 Text(
                                   '${index + 1}. ${question.question ?? 'प्रश्न उपलब्ध छैन'}',
-                                  style: const TextStyle(
-                                    fontFamily: 'NotoSansNepali',
+                                  style: TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 16,
+                                    fontSize: 18.sp,
                                   ),
                                 ),
-                                const SizedBox(height: 12),
+                                SizedBox(height: 12.h),
                                 ...List.generate(
                                   question.options?.length ?? 0,
                                   (optIndex) {
                                     final option = question.options![optIndex];
-                                    final label =
-                                        optIndex < labels.length
-                                            ? labels[optIndex]
-                                            : '';
+
                                     return RadioListTile<String>(
                                       title: Semantics(
-                                        label: '$label $option',
                                         child: Text(
-                                          '$label $option',
+                                          option,
                                           style: const TextStyle(
                                             fontFamily: 'NotoSansNepali',
                                           ),
@@ -238,10 +279,9 @@ class _PracticeScreenState extends State<PracticeScreen> {
                                                 });
                                               }
                                               : null,
-                                      contentPadding:
-                                          const EdgeInsets.symmetric(
-                                            horizontal: 8,
-                                          ),
+                                      contentPadding: EdgeInsets.symmetric(
+                                        horizontal: 8.w,
+                                      ),
                                       visualDensity: VisualDensity.compact,
                                     );
                                   },
@@ -253,21 +293,41 @@ class _PracticeScreenState extends State<PracticeScreen> {
                       },
                     ),
                   ),
-                  ElevatedButton(
-                    onPressed:
-                        _secondsRemaining > 0
-                            ? () => _handleSubmit(questions)
-                            : null,
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 12,
+                  Column(
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            "Slected: ${selectedAnswers.length}/25",
+                            style: TextStyle(fontSize: 16.sp),
+                          ),
+                          Spacer(),
+                          Text(
+                            'Remaining Time: ${_formatTime(_secondsRemaining)}',
+                            style: TextStyle(fontSize: 16.sp),
+                          ),
+                        ],
                       ),
-                    ),
-                    child: const Text(
-                      'जवाफ पेश गर्नुहोस्',
-                      style: TextStyle(fontFamily: 'NotoSansNepali'),
-                    ),
+                      SizedBox(height: 5.h),
+                      ElevatedButton(
+                        onPressed:
+                            _secondsRemaining > 0
+                                ? () => _handleSubmit(questions)
+                                : null,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              Theme.of(context).colorScheme.inversePrimary,
+                        ),
+                        child: Text(
+                          'Submit',
+                          style: TextStyle(
+                            fontSize: 18.sp,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
