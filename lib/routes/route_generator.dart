@@ -1,4 +1,5 @@
 import 'package:driver/home-screen/screen/home_screen.dart';
+import 'package:driver/home-screen/screen/vision_screen.dart';
 import 'package:driver/practice-screen/screen/practice_screen.dart';
 import 'package:driver/question-screen/screen/question_screen.dart';
 import 'package:driver/routes/route_name.dart';
@@ -14,7 +15,7 @@ class RouteGenerator {
           settings: settings,
           builder: (_) => const HomeScreen(),
         );
-case Routes.practiceScreen:
+      case Routes.practiceScreen:
         return MaterialPageRoute(
           settings: settings,
           builder: (_) => const PracticeScreen(),
@@ -24,6 +25,11 @@ case Routes.practiceScreen:
         return MaterialPageRoute(
           settings: settings,
           builder: (_) => QuestionScreen(title: arguments.toString()),
+        );
+      case Routes.colorVisionScreen:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => ColorVisionScreen(),
         );
       default:
         return MaterialPageRoute(
