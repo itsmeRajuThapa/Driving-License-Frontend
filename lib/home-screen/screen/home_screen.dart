@@ -29,10 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Nepali Driving License App'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-      ),
+      appBar: AppBar(title: const Text('Nepali Driving License App')),
       drawer: const CustomDrawer(),
       body: BackToExit(
         child: BlocBuilder<HomeBloc, HomeState>(
@@ -55,7 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
             } else if (state.status == Status.success &&
                 state.allQuestionDataList.isNotEmpty) {
               allQuestionDataList = state.allQuestionDataList;
-        
+
               return Padding(
                 padding: EdgeInsets.all(14.sp),
                 child: Column(
@@ -63,12 +60,16 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     Row(
                       children: [
-                        Container(color: Colors.green, height: 25.h, width: 4.w),
+                        Container(
+                          color: Colors.green,
+                          height: 25.h,
+                          width: 4.w,
+                        ),
                         SizedBox(width: 20.w),
                         Text(
                           "Mock Exam",
                           style: TextStyle(
-                            fontSize: 27.sp,
+                            fontSize: 25.sp,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -85,7 +86,6 @@ class _HomeScreenState extends State<HomeScreen> {
                           },
                           child: Card(
                             margin: EdgeInsets.all(5.sp),
-                            color: const Color.fromARGB(255, 248, 213, 213),
                             child: Container(
                               padding: EdgeInsets.all(16.sp),
                               child: Column(
@@ -102,7 +102,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   Text(
                                     'Practice Question',
                                     style: TextStyle(
-                                      fontSize: 19.sp,
+                                      fontSize: 16.sp,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -120,7 +120,6 @@ class _HomeScreenState extends State<HomeScreen> {
                           },
                           child: Card(
                             margin: EdgeInsets.all(5.sp),
-                            color: const Color.fromARGB(255, 248, 213, 213),
                             child: Container(
                               padding: EdgeInsets.all(16.sp),
                               child: Column(
@@ -131,13 +130,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                       'assets/images/74.png',
                                       fit: BoxFit.cover,
                                       height: 170.h,
-                                      width: 150.w,
+                                      width: 154.w,
                                     ),
                                   ),
                                   Text(
                                     'Color Vision Test',
                                     style: TextStyle(
-                                      fontSize: 19.sp,
+                                      fontSize: 16.sp,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -148,11 +147,15 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ],
                     ),
-        
+
                     SizedBox(height: 10.h),
                     Row(
                       children: [
-                        Container(color: Colors.green, height: 25.h, width: 4.w),
+                        Container(
+                          color: Colors.green,
+                          height: 25.h,
+                          width: 4.w,
+                        ),
                         SizedBox(width: 20.w),
                         Text(
                           "All Question List",
@@ -179,7 +182,6 @@ class _HomeScreenState extends State<HomeScreen> {
                             },
                             child: Card(
                               margin: EdgeInsets.all(5.sp),
-                              color: const Color.fromARGB(255, 248, 213, 213),
                               child: Container(
                                 padding: EdgeInsets.all(15.sp),
                                 child: Column(
@@ -207,7 +209,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           height: 20.h,
                                           width: 2.5.w,
                                         ),
-        
+
                                         Text(
                                           "    ${data.askableQuestions} will be asked",
                                           style: TextStyle(

@@ -26,10 +26,7 @@ class _QuestionListState extends State<QuestionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-      ),
+      appBar: AppBar(title: Text(widget.title)),
       body: BlocBuilder<QuestionBloc, QuestionState>(
         bloc: locator<QuestionBloc>(),
         builder: (context, state) {
@@ -101,11 +98,11 @@ class _QuestionListState extends State<QuestionScreen> {
                                   decoration: BoxDecoration(
                                     color: optionColor ?? Colors.grey[200],
                                     borderRadius: BorderRadius.circular(10.r),
-                                    border: Border.all(color: Colors.grey),
                                   ),
                                   child: Text(
                                     '${nepaliLabels[question.options!.indexOf(option)]}  ${option.toString()}',
                                     style: TextStyle(
+                                      color: Colors.black,
                                       fontSize: 17.sp,
                                       fontWeight: FontWeight.w600,
                                     ),

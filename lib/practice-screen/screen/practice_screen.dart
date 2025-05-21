@@ -100,10 +100,7 @@ class _PracticeScreenState extends State<PracticeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('अभ्यास प्रश्न'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-      ),
+      appBar: AppBar(title: const Text('अभ्यास प्रश्न')),
       body: BlocListener<PracticeBloc, PracticeState>(
         bloc: locator<PracticeBloc>(),
         listener: (context, state) {
@@ -155,10 +152,7 @@ class _PracticeScreenState extends State<PracticeScreen> {
                         SizedBox(height: 15.h),
                         Text(
                           'सही: ${state.correctAnswers ?? 0} / ${state.totalQuestions}',
-                          style: TextStyle(
-                            fontSize: 22.sp,
-                            color: Colors.black,
-                          ),
+                          style: TextStyle(fontSize: 22.sp),
                         ),
                       ],
                     ),
@@ -178,7 +172,7 @@ class _PracticeScreenState extends State<PracticeScreen> {
                         },
                         child: const Text('पुन: प्रयास गर्नुहोस्'),
                       ),
-                      Spacer(),
+
                       TextButton(
                         style: ButtonStyle(
                           backgroundColor: WidgetStateProperty.all<Color>(
@@ -263,13 +257,15 @@ class _PracticeScreenState extends State<PracticeScreen> {
                                       title: Semantics(
                                         child: Text(
                                           option,
-                                          style: const TextStyle(
-                                            fontFamily: 'NotoSansNepali',
-                                          ),
+                                          style: TextStyle(fontSize: 18.sp),
                                         ),
                                       ),
                                       value: option,
                                       groupValue: selected,
+                                      activeColor:
+                                          Theme.of(
+                                            context,
+                                          ).textTheme.bodyMedium?.color,
                                       onChanged:
                                           _secondsRemaining > 0
                                               ? (value) {
@@ -314,16 +310,12 @@ class _PracticeScreenState extends State<PracticeScreen> {
                             _secondsRemaining > 0
                                 ? () => _handleSubmit(questions)
                                 : null,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              Theme.of(context).colorScheme.inversePrimary,
-                        ),
+
                         child: Text(
                           'Submit',
                           style: TextStyle(
                             fontSize: 18.sp,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
                       ),

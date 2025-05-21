@@ -50,6 +50,8 @@ dependencies:
   flutter_screenutil: ^5.9.3
   connectivity_plus: ^5.0.2
   flutter_native_splash: ^2.4.6
+  google_fonts: ^6.2.1
+  provider: ^6.1.5
 
 
 

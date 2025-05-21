@@ -7,16 +7,24 @@ import 'package:driver/routes/route_generator.dart';
 import 'package:driver/services/navigation_service.dart';
 import 'package:driver/services/service_locator.dart';
 import 'package:driver/services/shared_preference_service.dart';
+import 'package:driver/utils/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 
-void main() {
-  //SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  setupLocator().then((value) => locator<SharedPrefsServices>().init());
+  await setupLocator();
+  await locator<SharedPrefsServices>().init();
+  final themeProvider = await ThemeProvider.init();
 
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => themeProvider,
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -35,20 +43,21 @@ class MyApp extends StatelessWidget {
         designSize: const Size(428, 926),
         minTextAdapt: true,
         splitScreenMode: true,
-        // Use builder only if you need to use library outside ScreenUtilInit context
         builder: (_, child) {
-          return MaterialApp(
-            title: 'Nepal Driving License App',
-            debugShowCheckedModeBanner: false,
-            navigatorKey: NavigationService.navigatorKey,
-            onGenerateRoute: RouteGenerator.generateRouter,
-
-            theme: ThemeData(
-              colorScheme: ColorScheme.fromSeed(
-                seedColor: const Color.fromARGB(255, 161, 135, 205),
-              ),
-            ),
-            home: EntryScreen(),
+          return Consumer<ThemeProvider>(
+            builder: (context, themeProvider, child) {
+              return MaterialApp(
+                title: 'Nepal Driving License App',
+                debugShowCheckedModeBanner: false,
+                navigatorKey: NavigationService.navigatorKey,
+                onGenerateRoute: RouteGenerator.generateRouter,
+                theme: AppTheme.lightTheme(),
+                darkTheme: AppTheme.darkTheme(),
+                themeMode:
+                    themeProvider.themeMode, // Use ThemeProvider's themeMode
+                home: const EntryScreen(),
+              );
+            },
           );
         },
       ),
